@@ -7,13 +7,17 @@ next:
   link: '/docs/pogget/group'
 ---
 
+<script setup>
+import CustomVinaPreview from '../../.vitepress/theme/components/CustomVinaPreview.vue'
+</script>
+
 # CustomVina：编写 Pogget 个性化预设
 
-CustomVina 是 Pogget 使用的个性化预设格式。预设文件使用 `.vina` 扩展名，由 Pogget 内置的 Vina 解析器读取，再交给收纳盒的绘制和交互代码执行。你可以只改颜色、圆角和标题，也可以声明一整棵自己的视图树。
+CustomVina 让你用 `.vina` 文件自定义 Pogget 收纳盒的外观和交互。你可以从颜色、圆角和标题开始，也可以继续调整文件图标、按钮和布局。
 
-这套格式不是网页 CSS。它没有选择器、`#rrggbb`、`px` 或 JavaScript；它更像一个带表达式的 UI 场景文件。下面会用“样式变量”的写法模拟 CSS 变量，但代码仍然是 Vina 语法。
+下面从创建第一个预设开始，逐步介绍常用写法。示例旁的效果示意可以直接查看，部分示例还可以调整参数或体验交互。
 
-本文按 VinaApp 当前的 `PoggetPersonalizationPanel.inl`、`PoggetPersonalizationRuntime.hpp` 和 `PoggetCore/Personalization` 实现整理；如果以后新增 slot 或 Action，以程序实际显示的 schema 为准。
+<CustomVinaPreview />
 
 ## 先做出第一个预设
 
@@ -40,6 +44,8 @@ CustomVina 是 Pogget 使用的个性化预设格式。预设文件使用 `.vina
 ### 2. 先从一个安全的小改动开始
 
 复制下面的代码到新预设中。它保留基础预设的全部内容，只在标题区域增加一个小标签。这个例子使用依赖模式，所以保留第一行 `Preset` 声明：
+
+<CustomVinaPreview variant="badge" />
 
 ```text
 Preset { dependsOn: "Pogget_Std" }
@@ -115,6 +121,10 @@ CornerMark {
 ### 块、属性和逗号
 
 最外层是一个或多个组件块。块里可以放属性，也可以放子块。属性使用 `名称: 值`，同级成员之间用逗号分隔，最后一个成员后可以保留逗号。
+
+下面的卡片通过 `vars` 集中设置间距和圆角，再在 `view` 中引用：
+
+<CustomVinaPreview variant="card" />
 
 ```text
 Card {
@@ -200,6 +210,8 @@ rgb fade red green blue average
 
 如果只需要调整标签和菜单的位置，可以使用一个 `pogget.native.Header` 兼容组件。它改变的是布局，不会替换原生点击、长按和菜单行为；同一预设只能声明一个 Header。
 
+<CustomVinaPreview variant="header" />
+
 ```text
 HeaderLayout {
   view {
@@ -213,11 +225,13 @@ HeaderLayout {
 }
 ```
 
-## 把 `ui` 当作样式变量面板
+## 用 `ui` 添加可调参数
 
-`ui` 不是 CSS，但它可以提供一个内嵌的“主题变量”面板。没有 `bind` 的字段只保存到当前预设，不会修改 Pogget 的原生设置；字段值通过 `${ui.字段名.value}` 参与表达式。
+在 `ui` 中声明的字段会显示在预设的高级面板里。没有 `bind` 的字段只保存到当前预设，不会修改 Pogget 的原生设置；字段值通过 `${ui.字段名.value}` 参与表达式。
 
-下面的写法相当于把颜色和圆角集中成一组可编辑的 CSS 变量：
+下面为强调色和圆角各添加一个控件，再用 `vars` 集中引用。试着调整预览下方的参数，观察标题表面的变化：
+
+<CustomVinaPreview variant="tokens" />
 
 ```text
 ThemeTokens {
@@ -269,7 +283,7 @@ ThemeTokens {
 }
 ```
 
-这里的 `ThemeTokens` 会在高级面板里显示两个控件；改动控件时，依赖它们的视图会重新计算。不要写成 `background: #2aa9be` 或 `padding: 12px`，这两种 CSS 写法不属于 CustomVina 语法。
+这里的 `ThemeTokens` 会在高级面板里显示两个控件；改动控件时，依赖它们的视图会重新计算。颜色使用 `rgb(42, 169, 190)`，圆角直接填写 `12` 这样的数值。
 
 ## 从零写一个可交互的按钮
 
@@ -278,6 +292,8 @@ ThemeTokens {
 `ui` 支持 `slider`、`number`、`switch`、`choice`/`select`、`text`、`color`、`button` 和 `font`。数字控件至少要有 `default`、`min`、`max`、`step`。
 
 ### 2. 用 `view` 显示按钮
+
+<CustomVinaPreview variant="button" />
 
 ```text
 ViewToggle {
@@ -338,6 +354,8 @@ ViewToggle {
 
 这是依赖标准预设时的最小覆盖示例。它覆盖 `TitleSurface` 的一部分属性，并保留原来的标题按钮和搜索布局：
 
+<CustomVinaPreview variant="capsule" />
+
 ```text
 Preset { dependsOn: "Pogget_Std" }
 
@@ -366,6 +384,8 @@ TitleSurface {
 
 文件图标的宿主输入已经包含 `${pogget.fileIcon.hovered}`、`${pogget.fileIcon.selected}` 和 `${pogget.fileIcon.x}` 等事实。下面的组件不会接管文件拖拽和排序，只绘制一个装饰层：
 
+<CustomVinaPreview variant="hover" />
+
 ```text
 FileHoverRing {
   view {
@@ -390,6 +410,8 @@ FileHoverRing {
 文件项目的完整声明式绘制还涉及 `fileIconSurface`、`fileIconContent`、`fileIconText` 和 `fileIconMotion`。如果只是加装饰，先用独立组件；如果要重排文件名、缩略图或拖动动画，再按标准预设对应的 slot 逐步接管。
 
 ### 用玻璃材质做一个信息卡
+
+<CustomVinaPreview variant="glass" />
 
 ```text
 GlassCard {
