@@ -73,9 +73,10 @@ FirstBadge {
     Text {
       type: "text",
       x: 10,
-      y: 6,
+      y: 5,
       width: 90,
       height: 18,
+      textY: 0,
       label: "CustomVina",
       textLiteral: true,
       textSize: 12,

@@ -252,7 +252,7 @@ const previewStyle = computed(() => {
 .cv-preview__label {
   top: calc(6px + var(--cv-title-offset));
   left: calc(8px + var(--cv-title-offset));
-  width: 114px;
+  width: 98px;
   height: 28px;
 }
 
@@ -271,8 +271,8 @@ const previewStyle = computed(() => {
   left: calc(368px - var(--cv-title-offset));
 }
 
-.cv-preview--header .cv-preview__label { left: 143px; }
-.cv-preview--header .cv-preview__menu { left: 235px; }
+.cv-preview--header .cv-preview__label { left: 137px; width: 126px; }
+.cv-preview--header .cv-preview__menu { left: 241px; }
 
 .cv-preview__badge {
   top: 7px;
