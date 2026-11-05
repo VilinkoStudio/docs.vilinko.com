@@ -55,7 +55,7 @@ FirstBadge {
     type: "group",
     interaction: "title",
     z: 10,
-    x: 16,
+    x: ${pogget.width} - 185,
     y: 8,
     width: 110,
     height: 28,
@@ -206,21 +206,28 @@ rgb fade red green blue average
 
 缺少 slot 的旧预设会保留对应的原生绘制。需要完整接管的阶段必须声明完整的 slot 组合；例如内联导航需要 surface 加上返回、主页、保存、打开、搜索五个按钮 slot，声明不完整时会回退整套原生工具栏。这样可以先从一个普通 `view` 组件开始，不必一次重写整个收纳盒。
 
-### 只调整原生标题控件的位置
+### 让标题和右侧菜单作为一个标签居中
 
 如果只需要调整标签和菜单的位置，可以使用一个 `pogget.native.Header` 兼容组件。它改变的是布局，不会替换原生点击、长按和菜单行为；同一预设只能声明一个 Header。
+
+下面为标准的“色块＋标题”标签预留右侧菜单的位置，再把整个标签居中。菜单仍然紧跟在标题右侧，折叠按钮保留在收纳盒右上角：
 
 <CustomVinaPreview variant="header" />
 
 ```text
 HeaderLayout {
+  vars {
+    tagWidth: ${pogget.titleTextWidth} + 58,
+    tagLeft: (${pogget.width} - ${vars.tagWidth}) / 2
+  },
   view {
     type: "pogget.native.Header",
-    tagAlign: "center",
-    tagY: 0,
-    tagHeight: 24,
-    moreX: ${pogget.width} / 2 - 7,
-    moreY: 30
+    tagX: ${vars.tagLeft},
+    tagY: 6,
+    tagWidth: ${vars.tagWidth},
+    tagHeight: 28,
+    moreX: ${vars.tagLeft} + ${vars.tagWidth} - 22,
+    moreY: 18
   }
 }
 ```
@@ -259,26 +266,21 @@ ThemeTokens {
     accent: ${ui.Accent.value},
     surface: fade(${ui.Accent.value}, -35),
     radius: ${ui.Radius.value}
-  },
+  }
+}
+
+TitleSurface {
+  vars { style: 1 },
   view {
-    type: "group",
-    width: ${pogget.width},
-    height: ${pogget.height},
-    interaction: "title",
-    z: 9,
     Surface {
-      type: "rect",
-      x: 16,
-      y: 8,
-      width: ${pogget.width} - 32,
-      height: 34,
-      radius: ${vars.radius},
-      background: ${vars.surface},
+      radius: ${ThemeTokens.vars.radius},
+      background: ${ThemeTokens.vars.surface},
       fillOpacity: 0.88,
       border: 1,
-      borderColor: ${vars.accent},
+      borderColor: ${ThemeTokens.vars.accent},
       borderOpacity: 0.45
-    }
+    },
+    Highlight { visible: false }
   }
 }
 ```
@@ -305,7 +307,7 @@ ViewToggle {
       min: 0,
       max: 300,
       step: 1,
-      default: 12
+      default: 280
     }
   },
   view {
@@ -361,7 +363,7 @@ Preset { dependsOn: "Pogget_Std" }
 
 TitleSurface {
   vars {
-    style: 2,
+    style: 1,
     alpha: 0.78,
     radius: 20
   },
