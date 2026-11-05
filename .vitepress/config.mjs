@@ -147,6 +147,7 @@ function createSidebar(lang = 'zh') {
 //      collapsed: true,
       items: [
         { text: 'Pogget', link: '/docs/pogget/index' },
+        { text: 'CustomVina 个性化预设', link: '/docs/pogget/custom-vina' },
         { text: '组件编组', link: '/docs/pogget/group' },
         { text: '映射收纳和普通收纳', link: '/docs/pogget/mapping' },
         { text: '缓存文件夹', link: '/docs/pogget/roaming' },
