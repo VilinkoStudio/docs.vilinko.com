@@ -147,7 +147,18 @@ function createSidebar(lang = 'zh') {
 //      collapsed: true,
       items: [
         { text: 'Pogget', link: '/docs/pogget/index' },
-        { text: 'CustomVina 个性化预设', link: '/docs/pogget/custom-vina' },
+        {
+          text: 'CustomVina 个性化预设',
+          collapsed: false,
+          items: [
+            { text: '从一个矩形开始', link: '/docs/pogget/custom-vina' },
+            { text: '接口参考', link: '/docs/pogget/custom-vina/reference' },
+            { text: '宿主输入', link: '/docs/pogget/custom-vina/inputs' },
+            { text: '内部动作', link: '/docs/pogget/custom-vina/actions' },
+            { text: '绘制阶段与高级布局', link: '/docs/pogget/custom-vina/slots' },
+            { text: '内置文案', link: '/docs/pogget/custom-vina/labels' }
+          ]
+        },
         { text: '组件编组', link: '/docs/pogget/group' },
         { text: '映射收纳和普通收纳', link: '/docs/pogget/mapping' },
         { text: '缓存文件夹', link: '/docs/pogget/roaming' },

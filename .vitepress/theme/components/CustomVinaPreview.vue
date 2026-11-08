@@ -46,6 +46,10 @@ const files = [
   { name: '说明.txt', kind: 'document' }
 ]
 const captions = {
+  rectangle: '在 (16, 64) 绘制一个 160 × 48 的纯色矩形。',
+  rounded: '同一个矩形增加半径 12 的圆角和宽度 1 的边框。',
+  label: '用一个组把背景和文字放在一起，子节点相对组定位。',
+  'simple-button': '点击“切换视图”，体验 action 与悬停不透明度。',
   overview: '标准收纳盒外观。将指针移到文件上，查看悬停边框。',
   badge: '在标题右侧添加标签，保留原来的标题、菜单和折叠按钮。',
   card: '上方和两侧留出 16 的间距，卡片高 48，圆角为 12。',
@@ -57,6 +61,7 @@ const captions = {
   glass: '纯色收纳盒上的玻璃卡片，位置、圆角和边缘效果与示例一致。'
 }
 const floatingTitle = computed(() => ['tokens', 'capsule'].includes(props.variant))
+const basicShape = computed(() => ['rectangle', 'rounded', 'label'].includes(props.variant))
 const hasHover = computed(() => ['overview', 'hover'].includes(props.variant))
 const previewStyle = computed(() => {
   const channels = accent.value.match(/[\da-f]{2}/gi).map(value => parseInt(value, 16))
@@ -95,6 +100,10 @@ const previewStyle = computed(() => {
             <NativeLayer name="more" label="菜单" class="cv-preview__menu cv-preview__glyph" />
             <NativeLayer name="collapse" label="折叠" class="cv-preview__collapse cv-preview__glyph" />
             <NativeLayer v-if="variant === 'badge'" name="badge-surface" label="CustomVina" class="cv-preview__badge" />
+            <div v-if="basicShape" class="cv-preview__basic-shape" :class="{ 'is-rounded': variant !== 'rectangle', 'has-border': variant === 'rounded' }">
+              <span v-if="variant === 'label'">我的第一张卡片</span>
+            </div>
+            <button v-if="variant === 'simple-button'" class="cv-preview__simple-button" type="button" :aria-pressed="listView" @click="listView = !listView">切换视图</button>
             <button
               v-if="variant === 'button'"
               class="cv-preview__toggle"
@@ -105,7 +114,7 @@ const previewStyle = computed(() => {
             >
               <NativeLayer :name="listView ? 'toggle-list' : 'toggle-grid'" />
             </button>
-            <div class="cv-preview__files" :class="{ 'is-list': listView, 'has-hover': hasHover }">
+            <div v-if="!basicShape" class="cv-preview__files" :class="{ 'is-list': listView, 'has-hover': hasHover }">
               <div v-for="file in files" :key="file.name" class="cv-preview__file" :tabindex="hasHover ? 0 : undefined" :aria-label="hasHover ? `${file.name}，聚焦查看边框效果` : undefined">
                 <span class="cv-preview__file-icon" aria-hidden="true">
                   <img :src="asset(file.kind)" width="64" height="64" alt="" draggable="false" />
@@ -383,10 +392,42 @@ const previewStyle = computed(() => {
 .cv-preview__toggle:hover { opacity: 0.75; }
 
 .cv-preview__toggle:focus-visible,
+.cv-preview__simple-button:focus-visible,
 .cv-preview__control input:focus-visible {
   outline: 2px solid var(--vp-c-brand-1);
   outline-offset: 3px;
 }
+
+.cv-preview__basic-shape {
+  position: absolute;
+  top: 64px;
+  left: 16px;
+  box-sizing: border-box;
+  width: 160px;
+  height: 48px;
+  background: rgb(32, 116, 154);
+  color: white;
+  text-align: center;
+  font: 14px/48px 'Segoe UI', sans-serif;
+}
+.cv-preview__basic-shape.is-rounded { border-radius: 12px; }
+.cv-preview__basic-shape.has-border { outline: 1px solid rgb(120, 210, 240); }
+.cv-preview__simple-button {
+  position: absolute;
+  top: 8px;
+  left: 180px;
+  width: 100px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: rgb(32, 116, 154);
+  color: white;
+  font: 12px 'Segoe UI', sans-serif;
+  cursor: pointer;
+  transition: opacity 160ms;
+}
+.cv-preview__simple-button:hover { opacity: 0.75; }
 
 .is-list {
   top: 64px;
@@ -456,5 +497,6 @@ const previewStyle = computed(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .cv-preview__toggle { transition: none; }
+  .cv-preview__simple-button { transition: none; }
 }
 </style>
