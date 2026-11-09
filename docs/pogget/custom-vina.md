@@ -277,7 +277,7 @@ TitleSurface {
 
 标准预设把图标背景扩展分为两个滑块：X 控制左右两侧，Y 控制上下两侧。单位为 DIP，范围均为 `0..64`，步长为 `1`，初始默认值均为 `4`。
 
-例如，让背景左右各扩展 `12`、上下各扩展 `6`：
+例如，让背景左右各扩展 `12`、上下各扩展 `6`，再整体向上移动 `3`：
 
 ```text
 Preset { dependsOn: "Pogget_Std" }
@@ -286,16 +286,25 @@ VinaIcon {
   ui {
     IconBackground { default: true },
     IconBackgroundExpandX { default: 12 },
-    IconBackgroundExpandY { default: 6 }
+    IconBackgroundExpandY { default: 6 },
+    IconBackgroundOffsetY { default: -3 }
   }
 }
 ```
 
 这会让背景总宽比图标增加 `24` DIP、总高增加 `12` DIP，图标位图尺寸保持不变。边框与背景共用这组尺寸，开启任一项就能看到 X/Y 滑块。只调横向时，仅写 `IconBackgroundExpandX`；只调纵向时，仅写 `IconBackgroundExpandY`。
 
+`IconBackgroundOffsetY` 是独立的 **Y 偏移**，范围 `-64..64` DIP，步长 `1`，默认 `0`。正值让背景和边框一起向下移动，负值向上移动；它不会改变背景宽高，也不会移动图标位图或文件名。没有 X 偏移控件。
+
+| 想要的效果 | 修改项 | 对应变化 |
+| --- | --- | --- |
+| 背景左右更宽 | `IconBackgroundExpandX` | 左右各扩展指定距离，中心不变 |
+| 背景上下更高 | `IconBackgroundExpandY` | 上下各扩展指定距离，中心不变 |
+| 背景整体上移或下移 | `IconBackgroundOffsetY` | 仅改变 Y 位置，尺寸不变 |
+
 这里覆盖的是滑块默认值，当前收纳盒已经保存的该预设参数优先。旧的 `IconBackgroundExpand` 单值仍作为未单独设置轴的兼容值；新样式应使用 X/Y。完整字段见[标准 VinaIcon 的附加外观字段](./custom-vina/reference#标准-vinaicon-的附加外观字段)。
 
-AI 个性化接口的 `pogget_personalization_schema` 同步提供 `icon_background` 说明和可验证的 `icon_background_example`，包含两轴路径、单位、用途及兼容规则。让 AI 修改现有样式时，应先读取目标收纳盒及预设，再按需覆盖对应轴并回读结果。
+AI 个性化接口的 `pogget_personalization_schema` 同步提供 `icon_background` 说明和可验证的 `icon_background_example`，包含扩展与 Y 偏移的路径、单位、用途及兼容规则。完整操作流程见[AI 的主题读取与视觉检查](#ai-style-review)。
 
 ### 复制与依赖
 
@@ -305,6 +314,57 @@ AI 个性化接口的 `pogget_personalization_schema` 同步提供 `icon_backgro
 | 复制自 | 展开后的完整独立样式 | 不跟随 | 需要独立维护整套外观 |
 
 目前只能依赖一个独立预设，不能形成依赖链。`dependsOn` 写预设名称，不带 `.vina` 或路径。差异可以覆盖属性、追加组件和子节点，不能删除继承内容，也不能把属性替换成块，或把块替换成属性。独立预设不写 `Preset`，需要自行包含所需组件。
+
+## AI 的主题读取与视觉检查 {#ai-style-review}
+
+### 先确认当前主题
+
+AI 每次开始写样式前，都应调用 `pogget_personalization_schema`，读取本次返回的 `current_theme`，然后读取目标收纳盒的 `pogget_get_container_personalization`。不能凭预设名或 `white`、`midnight` 等符号名猜测当前是暗黑还是明亮主题。
+
+schema 的 `current_theme` 包含以下字段：
+
+| 字段 | 用途 |
+| --- | --- |
+| `name` | 当前程序主题：`dark`、`light`，或奶茶 `milk_tea`、抹茶 `matcha`、北欧 `nord`、玫瑰 `rosy`、薄荷 `mint`、香芋 `taro`；其他配色为 `custom` |
+| `color_scheme` | 当前底色的明暗类别，`dark` 或 `light`；自定义主题也会给出此值 |
+| `palette` | 实际背景 `background`、表面 `surface`、文字 `text`、强调色 `accent`；每项同时提供 `rgb` 和 `colorref`，分别用于人类核对与 Vina 数值 |
+
+目标收纳盒的快照另外提供：
+
+| 字段 | 用途 |
+| --- | --- |
+| `theme` | 读取目标时的程序主题，结构与 `current_theme` 相同；主题变化后应以新快照为准 |
+| `container_colors` | 收纳盒自身的背景和标题配色；`custom_background` 表示是否自定义背景，`title_source` 的 `0/1/2` 分别为主题、标签、自定义；`background` 和 `title` 是已解析的颜色 |
+
+程序主题与收纳盒局部颜色可能不同。AI 应结合两者选择文字对比度和透明度，优先使用 `${pogget.theme.*}` 让样式适应主题，并保留用户已有的局部设置。上述主题来自 Pogget 当前调色板，不代表 Windows 的系统主题。
+
+### 有视觉能力时检查真实渲染
+
+有图片理解能力、且具备相应 MCP 写入权限的 AI，可以在保存候选预设后调用 `pogget_preview_personalization_preset`：
+
+内置 Agent 还需在模型配置中启用“模型支持图片理解”；未启用时，不向该模型提供此预览工具。外部 MCP 客户端自行确认模型能否查看返回的图片。
+
+| 参数 | 用途 |
+| --- | --- |
+| `preset_name` | 已保存、已读取的预设名称 |
+| `expected_fingerprint` | 本次读取到的预设指纹；文件变化后必须重新读取 |
+| `preview_view` | `grid`（默认）或 `list`，分别检查图标与列表视图 |
+| `preview_width` | 测试内容宽度，`300..960` DIP，默认 `480`；可用 `320` 检查窄布局 |
+| `preview_height` | 测试内容高度，`200..720` DIP，默认 `360` |
+
+工具会创建专用的临时普通收纳盒，加入程序生成的示例文件夹、文本、Markdown 和通用文件图标，应用预设，再从该收纳盒的原生绘制结果生成 PNG。它不接受用户文件路径或已有收纳盒 ID，不截取桌面、剪贴板或其他窗口；预设中直接引用外部图片路径时会拒绝预览。
+
+建议 AI 按以下顺序完成样式修改：
+
+1. 读取当前主题、目标快照、可编辑预设及其独立基础，确认本次修改范围。
+2. 使用依赖差异编写样式，调用校验接口，再保存为候选预设。
+3. 预览原样式和候选样式，比较同一主题、尺寸、视图下的效果；按需补查列表和窄布局。
+4. 查看返回的图片，检查文字对比度、字号、对齐、圆角、裁剪，以及背景 Y 偏移是否遮挡图标或文件名。发现问题就修改候选并重新检查。
+5. 确认效果合适后，再把候选应用到用户指定收纳盒并回读状态，说明实际检查过的范围。
+
+预览返回前会清理临时收纳盒和示例文件，因此 AI 评估图片时不会留下测试收纳盒；失败路径也会尝试清理。成功结果中的 `container_removed` 和 `sample_files_removed` 用于核对清理完成情况。清理不完整会报错，不能当作预览成功，也不应继续创建测试收纳盒。
+
+**渲染成功不等于美观合格。** `visual_review_required: true` 表示仍需 AI 查看图片判断。没有视觉能力的 AI 应说明仅完成语法、引用与状态校验，不应声称已做截图审美检查。预览使用主题中性底色，不能代替真实桌面上的透明合成、壁纸材质、悬停动画和实际摆放检查。
 
 ## 继续深入：纹理、玻璃与绘制阶段
 
