@@ -273,6 +273,30 @@ TitleSurface {
 
 `TitleSurface` 和 `Surface` 必须与基础预设的路径一致。依赖模式会保留未提到的内容，只覆盖这些属性，因此原有标题按钮与搜索布局仍然存在。这里的组件名和 `vars.style` 属于 `Pogget_Std` 的声明，并非所有预设都拥有的语言关键字。
 
+### 分别调整图标背景 X/Y {#icon-background-axes}
+
+标准预设把图标背景扩展分为两个滑块：X 控制左右两侧，Y 控制上下两侧。单位为 DIP，范围均为 `0..64`，步长为 `1`，初始默认值均为 `4`。
+
+例如，让背景左右各扩展 `12`、上下各扩展 `6`：
+
+```text
+Preset { dependsOn: "Pogget_Std" }
+
+VinaIcon {
+  ui {
+    IconBackground { default: true },
+    IconBackgroundExpandX { default: 12 },
+    IconBackgroundExpandY { default: 6 }
+  }
+}
+```
+
+这会让背景总宽比图标增加 `24` DIP、总高增加 `12` DIP，图标位图尺寸保持不变。边框与背景共用这组尺寸，开启任一项就能看到 X/Y 滑块。只调横向时，仅写 `IconBackgroundExpandX`；只调纵向时，仅写 `IconBackgroundExpandY`。
+
+这里覆盖的是滑块默认值，当前收纳盒已经保存的该预设参数优先。旧的 `IconBackgroundExpand` 单值仍作为未单独设置轴的兼容值；新样式应使用 X/Y。完整字段见[标准 VinaIcon 的附加外观字段](./custom-vina/reference#标准-vinaicon-的附加外观字段)。
+
+AI 个性化接口的 `pogget_personalization_schema` 同步提供 `icon_background` 说明和可验证的 `icon_background_example`，包含两轴路径、单位、用途及兼容规则。让 AI 修改现有样式时，应先读取目标收纳盒及预设，再按需覆盖对应轴并回读结果。
+
 ### 复制与依赖
 
 | 创建方式 | 保存内容 | 基础预设更新后 | 使用场景 |

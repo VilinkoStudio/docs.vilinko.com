@@ -26,7 +26,7 @@ MySettings {
 }
 ```
 
-自己提供的用户文字可用 `textLiteral: true` 按原文绘制；无需为每段自定义文字寻找一个近似文案 ID。下表列出当前注册的全部 **403 个标识符**，按名称分组，右侧为简体中文内容，便于核对准确含义。菜单装饰图标标记和多余排版空格已省略；格式化占位符（如 `%d`、`%s`）保留，引用本身不会自动补入参数。
+自己提供的用户文字可用 `textLiteral: true` 按原文绘制；无需为每段自定义文字寻找一个近似文案 ID。下表列出当前注册的全部 **405 个标识符**，按名称分组，右侧为简体中文内容，便于核对准确含义。菜单装饰图标标记和多余排版空格已省略；格式化占位符（如 `%d`、`%s`）保留，引用本身不会自动补入参数。
 
 ## A–C
 
@@ -185,6 +185,8 @@ MySettings {
 | --- | --- |
 | `pogget.label.iconBackgroundColorTitle` | 图标背景颜色 |
 | `pogget.label.iconBackgroundExpandTitle` | 图标背景扩展 |
+| `pogget.label.iconBackgroundExpandXTitle` | 图标背景 X 扩展 |
+| `pogget.label.iconBackgroundExpandYTitle` | 图标背景 Y 扩展 |
 | `pogget.label.iconBackgroundHoverOpacityTitle` | 图标悬停不透明度 |
 | `pogget.label.iconBackgroundOpacityTitle` | 图标背景不透明度 |
 | `pogget.label.iconBackgroundRadiusTitle` | 图标背景圆角 |
@@ -456,4 +458,4 @@ MySettings {
 | `pogget.label.windowCornerRadiusPrefix` | 窗口圆角大小: |
 | `pogget.label.windowCornerRadiusSuffix` | px |
 
-注册范围核对自 `PoggetPersonalizationLabels.inl`，中文内容取自 `MultiLanguage.hpp` 的当前简体中文默认文本（2026-11-08）。程序切换语言时按实际语言显示。
+注册范围核对自 `PoggetPersonalizationLabels.inl`，中文内容取自 `MultiLanguage.hpp` 的当前简体中文默认文本（2026-11-09）。程序切换语言时按实际语言显示。

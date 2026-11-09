@@ -434,10 +434,16 @@ ExpandableCard {
 | `IconBackgroundColor` | COLORREF；图标背景颜色 |
 | `IconBackgroundOpacity`、`IconBackgroundHoverOpacity` | `0..1`；背景普通/悬停不透明度 |
 | `IconBackgroundRadius` | `0..128`；图标背景圆角 |
-| `IconBackgroundExpand` | `0..64`；图标背景向外扩张量 |
+| `IconBackgroundExpandX` | `0..64` DIP，步长 `1`，初始默认 `4`；向左、右各扩展此距离，背景总宽增加两倍该值，高度不变 |
+| `IconBackgroundExpandY` | `0..64` DIP，步长 `1`，初始默认 `4`；向上、下各扩展此距离，背景总高增加两倍该值，宽度不变 |
+| `IconBackgroundExpand` | 旧版单值兼容入口；未单独覆盖的 X/Y 轴沿用此值，通常为 `4` DIP。标准面板已隐藏此控件，新修改使用 X/Y |
 | `IconBorder` | 布尔；启用图标边框 |
 | `IconBorderColor` | COLORREF；图标边框颜色 |
 | `IconBorderWidth` | `0..8`；图标边框宽度 |
 | `IconBorderOpacity` | `0..1`；图标边框不透明度 |
 
-本页按 `VinaStyle.hpp`、`VinaView.hpp`、`PoggetPersonalizationPanel.inl`、`PoggetPersonalizationRuntime.hpp` 和 `Pogget_Std.vina` 核对（2026-11-08）。`pressed`、`shadow`、`border`、`background`、`variants` 等同名子块属于保留元数据，不作为子视图绘制；当前普通外观使用上表扁平属性，不应把保留块名当成自动生效的样式接口。
+标准面板的两个滑块分别位于 `VinaIcon.ui.IconBackgroundExpandX` 和 `VinaIcon.ui.IconBackgroundExpandY`，开启图标背景或图标边框时显示。背景与边框共用扩展后的表面；这不会放大图标位图，也不会改变文件名布局、图标间距或点击区域。圆角上限为表面较短边的一半。
+
+修改预设时，建议覆盖对应 `ui` 字段的 `default`，保留 `view` 与滑块的连接，见[分别调整图标背景 X/Y](../custom-vina#icon-background-axes)。已有的预设内保存值优先于默认值；只改一个方向时，仅覆盖该轴。旧保存值和旧依赖预设的 `IconBackgroundExpand` 覆盖仍可沿用，单独设置的轴（包括 `0`）优先。
+
+本页按 `VinaStyle.hpp`、`VinaView.hpp`、`PoggetPersonalizationPanel.inl`、`PoggetPersonalizationRuntime.hpp` 和 `Pogget_Std.vina` 核对（2026-11-09）。`pressed`、`shadow`、`border`、`background`、`variants` 等同名子块属于保留元数据，不作为子视图绘制；当前普通外观使用上表扁平属性，不应把保留块名当成自动生效的样式接口。
