@@ -1,7 +1,7 @@
 ---
 prev:
-  text: '接口参考'
-  link: '/docs/pogget/custom-vina/reference'
+  text: 'Pogget_Std 字段表'
+  link: '/docs/pogget/custom-vina/standard-fields'
 next:
   text: '内部动作'
   link: '/docs/pogget/custom-vina/actions'
@@ -37,6 +37,18 @@ next:
 | `pogget.theme.darken` | 颜色；当前主题的暗部色 |
 | `pogget.theme.accent` | 颜色；当前主题强调色 |
 | `pogget.theme.monochrome` | 布尔；当前主题的背景红绿通道相等这一原生判定结果 |
+
+## 日期与当前图标路径
+
+| 输入 | 类型与用途 |
+| --- | --- |
+| `pogget.date.year` | 数值；系统本地日期的完整年份，如 `2026` |
+| `pogget.date.month` | 数值；月份 `1..12` |
+| `pogget.date.day` | 数值；当月日期 `1..31` |
+| `pogget.hoveredIcon.path` | 文本；当前收纳盒悬停图标的完整文件/文件夹路径，无悬停时为空 |
+| `pogget.selectedIcon.path` | 文本；当前收纳盒恰好选中一个图标时的完整路径，未选中、多选、失效时为空 |
+
+图标路径跟随当前普通、搜索或内联文件夹视图；编辑文档时为空。路径包含文件名，不是其父目录。日期跨天会随现有轮询刷新；静态验证/预览使用日期 `2000/1/1` 和空图标路径。读取示例见[日期与当前图标](./presets#日期与当前图标)。
 
 ## 标题与折叠
 

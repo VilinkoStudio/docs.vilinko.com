@@ -15,6 +15,12 @@ import CustomVinaPreview from '../../.vitepress/theme/components/CustomVinaPrevi
 
 CustomVina 用 `.vina` 文件描述 Pogget 收纳盒的外观和交互。先画一个矩形，再加圆角、文字、自适应宽度和按钮，最后修改原有组件。每一步只引入一组新概念。
 
+完整查表入口：
+
+- [接口参考](./custom-vina/reference)：图元、属性、表达式和面板布局。
+- [预设文件与继承](./custom-vina/presets)：一级子目录、外部图片与相对路径、父预设参数和 `disableParentPreset`，以及日期/当前图标引用。
+- [Pogget_Std 字段表](./custom-vina/standard-fields)：全部 52 个个性化字段对应的界面项目、类型、默认值、范围和选项值。
+
 已经写过预设，可以直接查表：
 
 | 要找什么 | 入口 |

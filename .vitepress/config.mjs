@@ -153,6 +153,8 @@ function createSidebar(lang = 'zh') {
           items: [
             { text: '从一个矩形开始', link: '/docs/pogget/custom-vina' },
             { text: '接口参考', link: '/docs/pogget/custom-vina/reference' },
+            { text: '预设文件与继承', link: '/docs/pogget/custom-vina/presets' },
+            { text: 'Pogget_Std 字段表', link: '/docs/pogget/custom-vina/standard-fields' },
             { text: '宿主输入', link: '/docs/pogget/custom-vina/inputs' },
             { text: '内部动作', link: '/docs/pogget/custom-vina/actions' },
             { text: '绘制阶段与高级布局', link: '/docs/pogget/custom-vina/slots' },

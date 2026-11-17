@@ -3,19 +3,21 @@ prev:
   text: '从一个矩形开始'
   link: '/docs/pogget/custom-vina'
 next:
-  text: '宿主输入'
-  link: '/docs/pogget/custom-vina/inputs'
+  text: '预设文件与继承'
+  link: '/docs/pogget/custom-vina/presets'
 ---
 
 # CustomVina 接口参考
 
-本页按类型列出当前语言的图元、属性、表达式、状态和面板控件。每张表左侧为可填写的名称，右侧说明用途；数值范围来自当前绘制与布局校验。另见[宿主输入](./inputs)、[内部动作](./actions)、[绘制阶段](./slots)和[内置文案](./labels)。
+本页按类型列出当前语言的图元、属性、表达式、状态和面板控件。每张表左侧为可填写的名称，右侧说明用途；数值范围来自当前绘制与布局校验。另见[预设文件与继承](./presets)、[Pogget_Std 字段表](./standard-fields)、[宿主输入](./inputs)、[内部动作](./actions)、[绘制阶段](./slots)和[内置文案](./labels)。
 
 ## 文件结构与值类型
 
 | 声明位置 | 用途 |
 | --- | --- |
-| `Preset { dependsOn: "名称" }` | 单层依赖声明；只能有一个独立基础，不带扩展名和路径 |
+| `Preset { dependsOn: "名称" }` | 单层依赖声明；只能有一个独立基础，不带扩展名，可写一级子目录，如 `"Theme/Base"` |
+| `Preset.parentValues { ... }` | 按父预设控件完整路径指定参数，值为同类型字面量，见[继承参数](./presets#为父预设指定参数) |
+| `Preset.disableParentPreset` | 布尔，默认 `false`；开启后个性化页只显示子预设显式声明的控件，保留父预设绘制 |
 | `组件名 { ... }` | 顶层组件，名称自定义；同层不允许重复 |
 | 组件的 `label`、`description`、`icon` | 设置面板中该组件分组的标题、说明和图标 |
 | `ui { ... }` | 声明可保存的面板参数 |
@@ -47,6 +49,7 @@ next:
 | `text` | 绘制 `label` 提供的文字 |
 | `icon` | 绘制字体图标字符，使用 `icon` 与对应 `font` |
 | `image` | 绘制 WIC 图片、Shell 图标或本次绘制的命名位图 |
+| `path` | 绘制点集路径；`border` 默认 `0`，需要描边时显式填写正宽度 |
 | `glass` | 玻璃高光/光效层，`background` 参与亮度计算，不自动填充背景 |
 | `content` | 绘制宿主登记的命名内容资源，如 Markdown；只在当前绘制调用中使用 |
 
@@ -175,7 +178,7 @@ next:
 
 | 属性 | 默认值、范围与用途 |
 | --- | --- |
-| `source` | 图片路径或宿主资源名；`content` 和资源文字也使用此字段 |
+| `source` | 图片绝对/相对路径或宿主资源名；相对路径基于声明该来源的预设目录，继承时保留父目录；`content` 和资源文字也使用此字段 |
 | `src` | `source` 的别名，显式 `source` 优先 |
 | `imageRenderer` | `"wic"`（默认）：WIC 图片；`"shell"`：Shell 图标；`"resource"`：本次绘制的命名位图 |
 | `imageFit` | `"stretch"`（默认）：拉伸；`"contain"`：保持比例完整放入目标矩形 |
@@ -187,6 +190,8 @@ next:
 | `contentScale` | `1`，`0.001..256`；同步内容缩放，以内容左上角为中心，在祖先裁剪建立后生效 |
 
 WIC/资源位图支持 `radius` 圆角；Shell 图标需要圆角时使用祖先组的 `clip` 与 `clipRadius`。裁切后的 `contain` 按源裁切区域比例排版。`resource`、`content` 只访问宿主本次登记的资源；缺少资源时不绘制，不能通过字符串创建原生函数。可用资源名见[资源表](./slots#命名资源)。
+
+本地图片的目录结构、继承来源、缓存及解码限制见[加载外部图片](./presets#加载外部图片)。`type: "path"` 的 `border` 与其他图元一致，默认 `0`；省略就不描边，开放路径要显式填写正宽度才会显示线条。
 
 ## 点击、悬停与动画
 
