@@ -178,7 +178,7 @@ next:
 
 | 属性 | 默认值、范围与用途 |
 | --- | --- |
-| `source` | 图片绝对/相对路径或宿主资源名；相对路径基于声明该来源的预设目录，继承时保留父目录；`content` 和资源文字也使用此字段 |
+| `source` | WIC 图片绝对/相对路径、原始 Shell 图标来源或宿主资源名；仅 WIC 相对路径基于声明该来源的预设目录，继承时保留父目录；Shell 来源原样传递；`content` 和资源文字也使用此字段 |
 | `src` | `source` 的别名，显式 `source` 优先 |
 | `imageRenderer` | `"wic"`（默认）：WIC 图片；`"shell"`：Shell 图标；`"resource"`：本次绘制的命名位图 |
 | `imageFit` | `"stretch"`（默认）：拉伸；`"contain"`：保持比例完整放入目标矩形 |
