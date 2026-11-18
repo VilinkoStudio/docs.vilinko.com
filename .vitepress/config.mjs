@@ -155,6 +155,7 @@ function createSidebar(lang = 'zh') {
             { text: '接口参考', link: '/docs/pogget/custom-vina/reference' },
             { text: '预设文件与继承', link: '/docs/pogget/custom-vina/presets' },
             { text: 'Pogget_Std 字段表', link: '/docs/pogget/custom-vina/standard-fields' },
+            { text: '文件图标提示气泡', link: '/docs/pogget/custom-vina/tooltips' },
             { text: '宿主输入', link: '/docs/pogget/custom-vina/inputs' },
             { text: '内部动作', link: '/docs/pogget/custom-vina/actions' },
             { text: '绘制阶段与高级布局', link: '/docs/pogget/custom-vina/slots' },

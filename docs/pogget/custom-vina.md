@@ -20,6 +20,7 @@ CustomVina 用 `.vina` 文件描述 Pogget 收纳盒的外观和交互。先画�
 - [接口参考](./custom-vina/reference)：图元、属性、表达式和面板布局。
 - [预设文件与继承](./custom-vina/presets)：一级子目录、外部图片与相对路径、父预设参数和 `disableParentPreset`，以及日期/当前图标引用。
 - [Pogget_Std 字段表](./custom-vina/standard-fields)：全部 52 个个性化字段对应的界面项目、类型、默认值、范围和选项值。
+- [文件图标提示气泡](./custom-vina/tooltips)：外观与行为策略、`matches()` 图片筛选、异步缩略图及隐藏节点的性能边界。
 
 已经写过预设，可以直接查表：
 

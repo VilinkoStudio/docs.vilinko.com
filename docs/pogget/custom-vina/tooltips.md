@@ -1,0 +1,127 @@
+---
+prev:
+  text: 'Pogget_Std 字段表'
+  link: '/docs/pogget/custom-vina/standard-fields'
+next:
+  text: '宿主输入'
+  link: '/docs/pogget/custom-vina/inputs'
+---
+
+# 文件图标提示气泡
+
+标准预设的 `FileTooltip` 组件控制文件图标悬停提示的布局、背景、文字、裁剪及显示策略。它使用 `slot: "fileTooltip"`，仍在整盒 `containerFrame` 之后、标题标签和工具栏自身的提示之前绘制。`z` 只调整阶段内部的顺序。
+
+默认外观沿用原有实现：600ms 后开始显示，200ms 线性淡入，离开时 200ms 淡出，拖动时 150ms 淡出；逻辑宽度或高度小于 200 DIP 时采用紧凑布局，并在首次绘制时锁定鼠标锚点。普通布局跟随图标位置，电脑、网络、回收站、控制面板默认不显示文件提示。背景保留原有的不透明填充及随进度改变宽度的边框，文字和阴影按进度变化。
+
+宿主继续负责悬停判定、取消计时器、拖动/折叠/销毁清理、文件信息及 DirectWrite 测量。提示装饰应保持被动，不设置 `action`、`holdAction` 或 `toggle`。其他控件的提示不属于这个阶段。缺少此 slot 的旧独立预设继续使用原生文件提示；依赖标准预设时直接覆盖 `FileTooltip`。
+
+## 调整外观和显示时间
+
+以下是可以直接保存的依赖预设。它只覆盖列出的字段，其余保留标准行为。
+
+```text
+Preset { dependsOn: "Pogget_Std" }
+
+FileTooltip {
+  vars { maxWidth: 340, radius: 10, fontSize: 13 },
+  view {
+    tooltip { delay: 350ms, fadeIn: 120ms },
+    Surface { background: rgb(30, 42, 56) }
+  }
+}
+```
+
+常用变量位于 `FileTooltip.vars`：`maxWidth` 最大宽度（默认 280），`font` 字体，`fontSize` 字号，`padding` 横向留白，`top`/`bottom` 纵向留白，`line` 行距，`radius` 圆角，`inset` 到窗口边缘的距离。`width`/`height`/`x`/`y` 是标准布局公式，也可以覆盖。直接覆盖文字字体或字号时，应同步修改下面的测量策略。
+
+## tooltip 策略
+
+元数据写在 `FileTooltip.view.tooltip`。下表的默认值是独立声明时的默认；标准预设会根据窗口大小覆盖其中的三个字段。
+
+| 字段 | 类型、默认值与含义 |
+| --- | --- |
+| `enabled` | 布尔，`true`；是否允许启动和显示文件提示；禁用会取消当前悬停的计时/淡入，重新启用后按当前延迟启动 |
+| `paintEnabled` | 布尔，`true`；仅控制绘制及文件信息读取，保留计时进度；标准在可用宽度小于 8 或高度小于 12 DIP 时关闭 |
+| `showSpecial` | 布尔，`false`；允许电脑、网络、回收站、控制面板等特殊项目显示提示 |
+| `delay` | 数值，默认 `600ms`；进入悬停后的延迟；`0` 立即开始 |
+| `fadeIn` | 数值，默认 `200ms`；淡入时间 |
+| `fadeOut` | 数值，默认 `200ms`；离开后的淡出时间 |
+| `dragFadeOut` | 数值，默认 `150ms`；拖动开始后的淡出时间 |
+| `pointerAnchor` | 布尔，`false`；使用鼠标锚点；标准紧凑布局为 `true` |
+| `followPointer` | 布尔，`false`；启用鼠标锚点后，每次绘制更新锚点；关闭则在首次有效绘制时锁定 |
+| `showMetadata` | 布尔，`true`；是否读取大小和修改时间；标准紧凑布局为 `false`；文本节点的可见性也应跟随此字段 |
+| `font` | 非空文本，默认 `"Segoe UI"`，最长 128 个 UTF-16 单元；文字测量字体 |
+| `textSize` | 数值，默认 `12`，范围 `1..256` DIP；文字测量字号 |
+| `textWidth` | 数值，默认 `1`，范围 `1..32768` DIP；测量文件名换行的实际可用宽度，标准自动使用 `vars.textWidth` |
+
+所有时间范围为 `0..10` 秒；`350ms` 等于 `0.35`。布尔字段只接受 `true`/`false` 或布尔表达式。计时参数在启动对应计时/动画时读取，修改时长不会重写已运行的动画；当前悬停的 `enabled` 变化会在重绘时重新协调。非法实时策略跳过该提示，不复用另一个图标的布局。
+
+策略在计时前也会求值；此时文件信息文本和测量结果尚不可用，不应据此定义 `enabled`、延迟或测量字体。宿主先测量三段文字宽度，再读取 `textWidth` 测量换行数，最后更新视图。用独立输入定义字体和字号，避免让测量参数反向依赖自己的测量结果。
+
+## 提示上下文 pogget.tooltip
+
+这些输入描述本次处理的提示。长度和坐标均为 DIP，数值是只读事实。
+
+| 输入 | 类型与含义 |
+| --- | --- |
+| `path` | 文本；当前提示项目的完整路径或原生图标标识，淡出期间仍保留 |
+| `name` | 文本；当前文件名；无法提取名称时使用路径 |
+| `sizeText`、`modifiedText` | 文本；宿主已格式化的大小/文件夹及修改时间，仅显示并启用信息读取时有效 |
+| `alpha` | 数值，`0..1`；提示的显示进度 |
+| `iconX`、`iconY`、`iconWidth`、`iconHeight` | 数值；图标当前交互矩形的位置及尺寸 |
+| `viewportWidth`、`viewportHeight` | 数值；窗口客户区逻辑宽高 |
+| `mouseX`、`mouseY` | 数值；当前鼠标客户区位置，应配合 `hasMouse` 使用 |
+| `anchorX`、`anchorY` | 数值；锁定或跟随后的鼠标锚点；尚未锁定时使用当前鼠标位置 |
+| `hasMouse` | 布尔；鼠标坐标是否有效 |
+| `special` | 布尔；是否为默认排除的特殊图标 |
+| `nameWidth`、`sizeWidth`、`modifiedWidth` | 数值；按测量字体和字号得到的三段文字宽度 |
+| `wrappedLines` | 数值，至少 `1`；文件名按 `textWidth` 排版后的行数 |
+
+实际引用要包含完整前缀，例如 `${pogget.tooltip.path}`。这些不是所有图标的查询接口。提示图片请使用 `tooltip.path`；`${pogget.hoveredIcon.path}` 在鼠标离开后会清空，而旧提示可能仍在淡出。
+
+## 用 matches 筛选图片并显示缩略图
+
+`matches(text, "pattern"[, "i"])` 返回布尔值。以下完整预设在图片上显示预览，其他文件继续使用标准文字提示。
+
+```text
+Preset { dependsOn: "Pogget_Std" }
+
+FileTooltip {
+  vars {
+    preview: matches(${pogget.tooltip.path}, "\\.(png|jpe?g|webp|gif|bmp|avif|jfif)$", "i"),
+    width: ${vars.preview} ? min(176,${vars.availableW}) : max(1,min(min(${vars.maxWidth},${vars.availableW}),${vars.contentWidth}+${vars.padding}*2+2)),
+    height: ${vars.preview} ? min(152,${vars.availableH}) : min(${vars.availableH},${vars.fixedHeight}+${vars.nameHeight})
+  },
+  view {
+    tooltip { showMetadata: !${FileTooltip.vars.preview} && !${FileTooltip.vars.compact} },
+    Text { visible: !${FileTooltip.vars.preview} },
+    Preview {
+      type: "image", imageRenderer: "wic", preferThumbnail: true,
+      visible: ${FileTooltip.vars.preview}, source: ${pogget.tooltip.path},
+      x: 8, y: 8,
+      width: max(1,${FileTooltip.vars.width}-16), height: max(1,${FileTooltip.vars.height}-16),
+      imageFit: "contain", opacity: ${pogget.tooltip.alpha}
+    }
+  }
+}
+```
+
+扩展名匹配不保证系统安装了该格式的 WIC 解码器。加载中或失败时图片暂不绘制。`preferThumbnail: true` 显式选择现有异步缩略图服务，保持比例且最长边不超过 128 像素，适合小预览；默认 `false` 保留完整 WIC 图片。服务优先使用内嵌缩略图，再尝试解码器缩小解码，最后在后台缩放，不会在界面线程同步回退到完整图片。部分解码器仍可能在后台读取完整帧，不能保证所有格式都减少底层解码工作。Shell 和资源后端不受此开关影响。
+
+### matches 语法与限制
+
+- 第一参数必须是文本表达式；pattern 和 flags 必须是字符串字面量，编译时校验并共享相同规则。
+- 默认查找任意匹配子串且区分大小写；`"i"` 只忽略 ASCII 大小写。`^`/`$` 表示整个文本的首尾，不按行匹配。
+- 支持 Unicode 字面量、`.`、分组 `()`、或 `|`、`*`/`+`/`?`、字符组及范围（如 `[a-z]`、`[^0-9]`）、转义标点、`\d`、`\w`、`\s`、`\b`。`.` 不匹配回车或换行；`\w` 和单词边界按 ASCII 字母、数字、下划线判定；`\s` 为制表符至回车及空格。
+- 不支持前后查找、反向引用、惰性量词、`{m,n}` 或其他 flags；不支持的写法会报错。
+- 单个规则最多 512 个 UTF-16 单元、512 个编译状态，分组深度最多 32；一份合成预设最多 128 个不同规则；输入文本最多 32768 个 UTF-16 单元。
+- 使用有界状态机，没有递归回溯；编译结果在不可变文档中共享，匹配状态使用固定存储。非法语法拒绝候选预设，非法实时输入沿用通用的上一有效帧机制。
+
+`.vina` 字符串自身需要转义反斜杠，因此正则中的 `\.` 写成 `"\\."`。若外层再包 JSON 字符串，还需要再转义一次。以上代码块已经是可以直接保存到 `.vina` 的形式。
+
+## visible: false 的性能边界
+
+节点或祖先 `visible: false` 时，不绘制、不命中，也不会为其解析图片路径、启动 WIC 解码、请求缩略图或调用同步 `content` 绘制回调。用它控制图片预览可以避免隐藏内容的首次加载。
+
+节点仍保留在保留式视图树中，拓扑、状态、已解析属性和之前缓存的 GPU 位图不会因隐藏立即删除，便于恢复显示。属性表达式和依赖更新仍可能运行；已排队的共享缩略图任务可能完成，隐藏不会取消其他节点也在使用的任务。`opacity: 0` 不提供同等的资源加载门控。
+
+Agent 可从个性化 schema 读取 `matches`、`visibility`、`file_tooltip`、`file_tooltip_policy`、`file_tooltip_inputs` 和 `external_images`。收纳盒快照的 `file_tooltip` 返回最近提示上下文下求值的策略摘要，不额外输出提示路径或文本。修改应以所检查依赖的 `FileTooltip` 增量为准，并保持测量与绘制参数一致。

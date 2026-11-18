@@ -65,7 +65,7 @@ next:
 | `width`、`height` | 数值，默认 `40`，范围 `0..32768`；视图尺寸，不会自动撑满父节点 |
 | `w`、`h` | 宽、高的兼容别名；同时存在时 `width`、`height` 优先 |
 | `z` | 数值，默认 `0`，范围 ±32768；同级绘制层级，相同值按声明顺序排列 |
-| `visible` | 布尔，默认 `true`；隐藏后不绘制、不命中，影响子视图 |
+| `visible` | 布尔，默认 `true`；隐藏后不绘制、不命中，影响子视图；跳过图片路径解析、解码、缩略图请求和同步内容绘制，但保留节点、状态与既有缓存 |
 | `enabled` | 布尔，默认 `true`；控制交互是否启用，影响子视图 |
 | `opacity` | 数值，默认 `1`，范围 `0..1`；整体不透明度，与父节点不透明度相乘 |
 | `slot` | 字符串；指定宿主绘制阶段，子节点默认继承，见[完整表](./slots) |
@@ -181,6 +181,7 @@ next:
 | `source` | WIC 图片绝对/相对路径、原始 Shell 图标来源或宿主资源名；仅 WIC 相对路径基于声明该来源的预设目录，继承时保留父目录；Shell 来源原样传递；`content` 和资源文字也使用此字段 |
 | `src` | `source` 的别名，显式 `source` 优先 |
 | `imageRenderer` | `"wic"`（默认）：WIC 图片；`"shell"`：Shell 图标；`"resource"`：本次绘制的命名位图 |
+| `preferThumbnail` | 布尔，默认 `false`；WIC 图片改用现有后台缩略图服务，最长边 128 像素，加载中/失败时不绘制；Shell/资源后端忽略 |
 | `imageFit` | `"stretch"`（默认）：拉伸；`"contain"`：保持比例完整放入目标矩形 |
 | `imageCrop` | `false`；对 WIC/资源位图启用源矩形裁切 |
 | `imageSourceX`、`imageSourceY` | `0`，`0..32768`；源图中的裁切起点，单位源图 DIP |
@@ -269,6 +270,7 @@ ExpandableCard {
 | `sqrt(v)` | 平方根，输入须非负 |
 | `pow(a,b)` | 幂，与 `a ^ b` 相同 |
 | `hypot(x,y)` | 计算 `sqrt(x*x + y*y)` |
+| `matches(text,"pattern"[,"i"])` | 文本模式匹配，返回布尔；pattern/flags 必须是字面量；支持的语法、转义和有界执行限制见[详细说明](./tooltips#matches-语法与限制) |
 | `rgb(r,g,b)` | 构造 COLORREF，各通道截断并限制到 `0..255` |
 | `red(c)`、`green(c)`、`blue(c)` | 读取 COLORREF 的红、绿、蓝通道 |
 | `average(c)` | 读取颜色通道的整数平均亮度 |

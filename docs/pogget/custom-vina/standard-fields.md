@@ -3,8 +3,8 @@ prev:
   text: '预设文件与继承'
   link: '/docs/pogget/custom-vina/presets'
 next:
-  text: '宿主输入'
-  link: '/docs/pogget/custom-vina/inputs'
+  text: '文件图标提示气泡'
+  link: '/docs/pogget/custom-vina/tooltips'
 ---
 
 # Pogget_Std 个性化字段表

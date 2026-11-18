@@ -1,7 +1,7 @@
 ---
 prev:
-  text: 'Pogget_Std 字段表'
-  link: '/docs/pogget/custom-vina/standard-fields'
+  text: '文件图标提示气泡'
+  link: '/docs/pogget/custom-vina/tooltips'
 next:
   text: '内部动作'
   link: '/docs/pogget/custom-vina/actions'
@@ -220,6 +220,10 @@ next:
 | `pogget.fileIcon.deformAxis` | 数值；排序形变轴 |
 | `pogget.fileIcon.cursorX` | 数值；列表摆动使用的鼠标横坐标 |
 | `pogget.fileIcon.pressX` | 数值；按压横坐标 |
+
+## 文件提示 pogget.tooltip
+
+`pogget.tooltip.*` 在文件图标提示的计时/绘制阶段描述当前项，包含路径、名称、信息文字、显示进度、图标矩形、客户区、鼠标锚点和文字测量结果。完整字段、有效时机及图片预览示例见[提示上下文](./tooltips#提示上下文-pogget-tooltip)。淡出中的图片使用 `${pogget.tooltip.path}`；全局 `${pogget.hoveredIcon.path}` 在离开时会清空。
 
 ## 内联导航与搜索
 
